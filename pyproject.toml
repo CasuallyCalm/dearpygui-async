@@ -41,9 +41,8 @@ dependencies = [
   "pytest",
 ]
 
-[tool.hatch.envs.tests]
-dependencies = ['dearpygui']
-# path = '.venv'
+[tool.hatch.envs.examples]
+dependencies = ['dearpygui','discord.py']
 
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"

@@ -21,6 +21,8 @@ __pycache__/
 /backend/dist/
 /dist/
 /site/
+/.direnv
 
 # Root files
 /.coverage*
+/.env
