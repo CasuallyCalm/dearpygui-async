@@ -18,7 +18,7 @@ dpg_async = DearPyGuiAsync(loop=client.loop)
 async def send_message_from_gui_on_send():
     channel = client.get_channel(1088861021126541394)
     msg = dpg.get_value("input")
-    print(msg)
+    print(f'Sent Message: {msg}')
     await channel.send(msg)
 
 
@@ -39,7 +39,7 @@ async def on_message(message:discord.Message):
 
 
 async def setup_hook():
-    asyncio.create_task(dpg_async.start())
+    await dpg_async.start()
 
 
 async def teardown():
