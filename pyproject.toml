@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 [project]
 name = "dearpygui-async"
 dynamic = ["version"]
-description = ''
+description = 'An async helper for dearpygui'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
-keywords = []
+keywords = ['dearpygui', 'async', 'python', 'gui','desktop','asyncio']
 authors = [
   { name = "CasuallyCalm", email = "void@some.where" },
 ]
@@ -23,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
+  "Framework :: AsyncIO"
 ]
 dependencies = []
 
@@ -39,6 +40,11 @@ dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
 ]
+
+[tool.hatch.envs.tests]
+dependencies = ['dearpygui']
+# path = '.venv'
+
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"

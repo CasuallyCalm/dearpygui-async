@@ -11,6 +11,7 @@ __pycache__/
 # Root directories
 /.benchmarks/
 /.cache/
+/.venv/
 /.env/
 /.idea/
 /.mypy_cache/
