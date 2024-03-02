@@ -1,3 +1,7 @@
+'''
+A more useful use case to add a GUI to a discord bot using discord.py (https://discordpy.readthedocs.io)
+'''
+
 import asyncio
 import os
 
@@ -28,6 +32,11 @@ def get_roles():
 async def on_ready():
     print("logged in")
 
+@client.event
+async def on_message(message:discord.Message):
+    slider_value = dpg.get_value('slider')
+    dpg.set_value('slider', slider_value+1)
+
 
 async def setup_hook():
     asyncio.create_task(dpg_async.start())
@@ -35,7 +44,7 @@ async def setup_hook():
 
 async def teardown():
     await client.close()
-
+    await dpg_async.stop()
 
 dpg_async.teardown = teardown
 
