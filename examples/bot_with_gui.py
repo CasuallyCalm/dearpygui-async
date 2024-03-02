@@ -2,7 +2,6 @@
 A more useful use case to add a GUI to a discord bot using discord.py (https://discordpy.readthedocs.io)
 '''
 
-import asyncio
 import os
 
 import dearpygui.dearpygui as dpg
@@ -16,14 +15,14 @@ dpg_async = DearPyGuiAsync(loop=client.loop)
 
 
 async def send_message_from_gui_on_send():
-    channel = client.get_channel(1088861021126541394)
+    channel = client.get_channel(1088861021126541394) # replace with your guild ID
     msg = dpg.get_value("input")
     print(f'Sent Message: {msg}')
     await channel.send(msg)
 
 
 def get_roles():
-    guild = client.get_guild(365633712945102848)
+    guild = client.get_guild(365633712945102848) # replace with your channel ID
     for role in guild.roles:
         dpg.add_text(f"{role.name}:{role.id}", parent="Window")
 
