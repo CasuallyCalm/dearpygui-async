@@ -9,7 +9,7 @@ A simple way to integrate some async functionality into your dearpygui applicati
 
 * Ease of use
 * Async callbacks
-* Setup & Teardown functions for us with other async applications
+* Setup & Teardown functions for use with other async applications
 
 ## Installation
 
