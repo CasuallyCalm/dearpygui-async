@@ -28,9 +28,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Documentation = "https://github.com/unknown/dearpygui-async#readme"
-Issues = "https://github.com/unknown/dearpygui-async/issues"
-Source = "https://github.com/unknown/dearpygui-async"
+Documentation = "https://github.com/CasuallyCalm/dearpygui-async#readme"
+Issues = "https://github.com/CasuallyCalm/dearpygui-async/issues"
+Source = "https://github.com/CasuallyCalm/dearpygui-async"
 
 [tool.hatch.version]
 path = "src/dearpygui_async/__about__.py"
