@@ -43,7 +43,7 @@ with dpg.window(label="Example Window"):
     dpg.add_slider_float(label="float")
 
 dpg.show_viewport()
-dpg_async.run() # run; replaces `dpg.start_gui()`
+dpg_async.run() # run; replaces `dpg.start_dearpygui()`
 dpg.destroy_context()
 
 ```
