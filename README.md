@@ -16,6 +16,7 @@ A simple way to integrate some async functionality into your dearpygui applicati
 ```console
 pip install dearpygui-async
 ```
+### Note: you will need to install dearpygui separately in order to use this!
 
 
 ## Simple Example
