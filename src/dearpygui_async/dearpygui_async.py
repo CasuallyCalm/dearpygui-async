@@ -1,7 +1,19 @@
 import asyncio
+import time
 
 import dearpygui.dearpygui as dpg
 
+
+async def _sleep(seconds:float):
+    '''An asyncio sleep.
+
+    On Windows this achieves a better granularity than asyncio.sleep
+
+    Args:
+        seconds (float): Seconds to sleep for.
+    
+    '''
+    await asyncio.get_running_loop().run_in_executor(None, time.sleep, seconds)
 
 class DearPyGuiAsync:
 
@@ -60,7 +72,7 @@ class DearPyGuiAsync:
         while dpg.is_dearpygui_running():
             asyncio.create_task(self.run_callbacks(dpg.get_callback_queue()))
             dpg.render_dearpygui_frame()
-            await asyncio.sleep(0)
+            await _sleep(0.0095)
         await self.teardown() 
 
     async def start(self):

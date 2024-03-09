@@ -14,11 +14,23 @@ running = False
 paused = False
 progress = 0
 
+async def sleep(seconds:float):
+    '''An asyncio sleep.
+
+    On Windows this achieves a better granularity than asyncio.sleep
+
+    Args:
+        seconds (float): Seconds to sleep for.
+    
+    '''
+    await asyncio.get_running_loop().run_in_executor(None, time.sleep, seconds)
+
 # This task is blocking due to time.sleep. Using asyncio.sleep would allow you to do this
 # without blocking the event loop, but adds additional time overhead due to the nature of asyncio
 # To convert this to not block the event loop are commented
+# Due to how asyncio.sleep currently (3.12) works on windows, a different sleep is being used to get more accurate time
 def run_task():
-# async def run_task
+# async def run_task():
     start = time.time() 
     global running
     global paused
@@ -27,7 +39,7 @@ def run_task():
     
     for i in range(1,101):
         while paused:
-            # await asyncio.sleep(0.1)
+            # await sleep(0.1)
             time.sleep(0.1)
         if not running:
             return
@@ -35,8 +47,8 @@ def run_task():
         print(i)
         dpg.set_value(progress_bar, 1/100 * (i))
         dpg.configure_item(progress_bar, overlay=f"{i}%")
-        # await asyncio.sleep(0.5)
         time.sleep(0.05)
+        # await sleep(0.05)
 
     print("Finished")
     running = False
@@ -55,10 +67,10 @@ def start_stop_callback():
         # these two lines perform essentially the same way to run blocking
         # code without blocking the main event loop
         #--------------------------------
-        # dpg_async.loop.run_in_executor(None, run_task)
-        asyncio.create_task(asyncio.to_thread(run_task))
+        dpg_async.loop.run_in_executor(None, run_task)
+        # asyncio.create_task(asyncio.to_thread(run_task))
         #-----------------------------
-        # asyncio.create_task(run_task()) # uncomment below to run an the non-blocking version and comment out the previous lines to run the blocking version
+        # asyncio.create_task(run_task()) # uncomment to run an the non-blocking version and comment out the previous lines to run the blocking version
         dpg.set_item_label(start_pause_resume_button, "Pause")
     else:
         if not paused:
