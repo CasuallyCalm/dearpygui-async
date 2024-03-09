@@ -47,7 +47,8 @@ def start_stop_callback():
         print("Started")
         running = True
         paused = False
-        asyncio.create_task(run_task())
+        dpg_async.create_task(print('not async'))
+        dpg_async.create_task(run_task())
         dpg.set_item_label(start_pause_resume_button, "Pause")
     else:
         if not paused:

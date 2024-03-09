@@ -9,10 +9,9 @@ import discord
 from basic_async import dpg_start, dpg_stop
 from dearpygui_async import DearPyGuiAsync
 
+dpg_async = DearPyGuiAsync()
+
 client = discord.Client(intents=discord.Intents.all())
-
-dpg_async = DearPyGuiAsync(loop=client.loop)
-
 
 async def send_message_from_gui_on_send():
     channel = client.get_channel(1088861021126541394) # replace with your guild ID
@@ -37,17 +36,16 @@ async def on_message(message:discord.Message):
     dpg.set_value('slider', slider_value+1)
 
 
-async def setup_hook():
-    await dpg_async.start()
+async def setup():
+        await client.start(os.environ.get("TOKEN"))
 
 
 async def teardown():
     await client.close()
-    await dpg_async.stop()
 
 dpg_async.teardown = teardown
 
-client.setup_hook = setup_hook
+dpg_async.setup = setup
 
 dpg_start()
 
@@ -60,5 +58,5 @@ dpg.add_button(
 
 dpg.add_button(label="Get Roles", parent="Window", callback=get_roles)
 
-client.run(os.environ.get("TOKEN"))
+dpg_async.run()
 dpg_stop()

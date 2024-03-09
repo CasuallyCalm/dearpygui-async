@@ -1,20 +1,36 @@
 import asyncio
+import threading
 
 import dearpygui.dearpygui as dpg
 
 
+def _is_coro(function):
+    return asyncio.iscoroutinefunction(function) or dpg.inspect.isawaitable(function) #asyncio.iscoroutinefunction(function.__call__) 
+
 class DearPyGuiAsync:
 
     __callback_task:asyncio.Task
+    __run_thread = True
 
-    def __init__(self, loop=None):
-        self.loop = loop or asyncio.get_event_loop()
+    def __init__(self):
+        self.loop = asyncio.new_event_loop()
+        threading.Thread(target=self.__start_thread, daemon=True).start()
+
+    def __start_thread(self):
+        '''
+        Starts the async event loop on a separate thread to prevent blocking dpg.
+        Coroutines must be added using either self.loop.
+        '''
+        asyncio.set_event_loop(self.loop) 
+        self.loop.run_forever()
+
 
     async def setup(self):
         '''
         Special method that runs when starting
         This is helpful for running code that has special setup behavior that may be asynchronous
         '''
+        print('setup')
         pass
 
     async def teardown(self):
@@ -22,9 +38,10 @@ class DearPyGuiAsync:
         Special method that runs when shutting down.
         This is helpful for running code that has special shutdown behavior that may be asynchronous
         '''
+        print('teardown')
         pass
 
-    async def run_callbacks(self, jobs):
+    def run_callbacks(self, jobs):
         '''
         Run the callbacks that were added
         '''
@@ -39,50 +56,60 @@ class DearPyGuiAsync:
                     args = []
                     for arg in range(len(sig.parameters)):
                         args.append(job[arg + 1])
-                    if asyncio.iscoroutinefunction(
-                        job[0]
-                    ) or asyncio.iscoroutinefunction(job[0].__call__):
+                    if _is_coro(job[0]):
                         try:
-                            await job[0](*args)
+                            self.create_task(job[0](*args))
                         except Exception as e:
                             print(e)
                     else:
                         job[0](*args)
 
 
-    async def callback_loop(self):
+    def callback_loop(self):
         '''
-        |coro|
         Processes the the callbacks asynchronously
         This will configure the app to manually manage the callbacks so overwrite this if you want to do something else
         '''
         dpg.configure_app(manual_callback_management=True)
-        while dpg.is_dearpygui_running():
-            asyncio.create_task(self.run_callbacks(dpg.get_callback_queue()))
+        while self.__run_thread and dpg.is_dearpygui_running():
+            self.run_callbacks(dpg.get_callback_queue())
             dpg.render_dearpygui_frame()
-            await asyncio.sleep(0)
-        await self.teardown() 
+        if self.__run_thread:
+            self.stop()
+        
+    # def __start(self):
+    #     '''
+    #     |blocking|
+    #     Run DearPyGui with async compatibility
+    #     Use this in place of `dpg.start_gui()`
+        
+    #     '''
+    #     self.create_task(self.setup())
+    #     self.callback_loop()
 
-    async def start(self):
+    def create_task(self, coro):
         '''
-        |coro|
-        For starting the gui in an async context
-        Usually to add a gui to another async process
+        Run a coroutine on the separate async thread
         '''
-        await self.setup()
-        self._callback_task = asyncio.create_task(self.callback_loop()) 
-    
-    async def __start(self):
-        await self.setup()
-        await self.callback_loop()
+        if _is_coro(coro):
+            asyncio.run_coroutine_threadsafe(coro, loop=self.loop)
 
-    async def stop(self):
+    def create_task_sync(self, func, *args):
         '''
-        |coro|
+        Run a function on the separate async thread
+        '''
+        self.loop.call_soon_threadsafe(func, *args)
+
+    def stop(self):
+        '''
         Manually cancel the callback processing task
         '''
-        self._callback_task.cancel()
-        await self.teardown()
+        self.__run_thread = False
+        async def stop():
+            await self.teardown()
+            await asyncio.sleep(0)
+            self.loop.stop
+        self.create_task(stop())
 
     def run(self):
         '''
@@ -91,4 +118,6 @@ class DearPyGuiAsync:
         Use this in place of `dpg.start_gui()`
         
         '''
-        self.loop.run_until_complete(self.__start())
+        # self.__start()
+        self.create_task(self.setup())
+        self.callback_loop()
