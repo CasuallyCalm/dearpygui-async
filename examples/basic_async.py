@@ -5,8 +5,8 @@ import asyncio
 import dearpygui.dearpygui as dpg
 from dearpygui_async import DearPyGuiAsync
 
-HEIGHT = 300
-WIDTH = 400
+HEIGHT = 400
+WIDTH = 600
 
 
 async def save_callback():

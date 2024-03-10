@@ -1,6 +1,5 @@
 import asyncio
-
-# import time
+import time
 from datetime import datetime
 
 import dearpygui.dearpygui as dpg
@@ -14,6 +13,11 @@ running = False
 paused = False
 progress = 0
 
+async def sleep(seconds: float):
+    '''More accurate timer for windows w/ python 3.11+'''
+
+    await asyncio.get_running_loop().run_in_executor(None, time.sleep, seconds)
+
 async def run_task():
     start = datetime.now()
     global running
@@ -23,14 +27,14 @@ async def run_task():
     
     for i in range(1,101):
         while paused:
-            await asyncio.sleep(0.1)
+            await sleep(0.1)
         if not running:
             return
         progress = i
         print(i)
         dpg.set_value(progress_bar, 1/100 * (i))
         dpg.configure_item(progress_bar, overlay=f"{i}%")
-        await asyncio.sleep(0.05)
+        await sleep(0.05)
 
     print("Finished")
     running = False
@@ -47,8 +51,7 @@ def start_stop_callback():
         print("Started")
         running = True
         paused = False
-        dpg_async.create_task(print('not async'))
-        dpg_async.create_task(run_task())
+        dpg_async.create_task(run_task()) # pass an async task to the dpg async thread
         dpg.set_item_label(start_pause_resume_button, "Pause")
     else:
         if not paused:
